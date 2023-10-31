@@ -1,0 +1,20 @@
+#필요한 패키지 설치
+sudo apt install sqlite3
+sudo pip install orm[sqlite]
+sudo pip install sqlalchemy
+sudo pip install alembic
+
+#필요한 설정
+(프로젝트 내) alembic init migrations
+(프로젝트 내) 
+alembic.ini 파일 내 
+sqlalchemy.url = sqlite:///./scheduleManager.db 로 수정
+(프로젝트 내) 
+migrations/env.py 파일 내 
+import models
+
+target_metadata = model.Base.metadata 로 수정
+
+#SQLITE3 DB생성
+alembic revision --autogenerate
+alembic upgreade head
