@@ -11,7 +11,6 @@ class MultiCall:
     def __init__(self):
         self.maxLineCount = 2
         self.currentRunnerCount = 0
-        self.sender = SendCall(self.callback)
     
     async def run(self):
         while True:
@@ -32,9 +31,10 @@ class MultiCall:
                         # DB상태변경 (연결중)
                         model["stat"] = "1"
                         transaction.updSchedule(model)
-                        self.sender.setModel(model)
+                        sender = SendCall(self.callback)
+                        sender.setModel(model)
                         info("originate " + model["phnNum"])
-                        self.sender.originate(model["phnNum"])
+                        sender.originate(model["phnNum"])
                 else:
                     info('현재 남은 아웃바운드 회선이 없습니다...')
                     await asyncio.sleep(1)

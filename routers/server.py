@@ -7,17 +7,6 @@ import transaction
 
 import asyncio
 
-# 비동기 클래스 생성
-class AsyncClass:
-    async def async_method(self):
-        while True:
-            info('async...')
-            await asyncio.sleep(1)
-        return "Async method complete"
-
-
-
-
 sgCall = SingleCall()
 mtCall = MultiCall()
 
@@ -25,8 +14,8 @@ serverRouter = APIRouter(prefix='/server', tags=['/server'])
 
 @serverRouter.on_event("startup")
 async def on_startup():
-    #asyncio.create_task(sgCall.run())
-    asyncio.create_task(mtCall.run())
+    asyncio.create_task(sgCall.run())
+    #asyncio.create_task(mtCall.run())
 
 @serverRouter.get("/status")
 async def serverStatus():

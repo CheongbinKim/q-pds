@@ -9,6 +9,7 @@ class SendCall:
         self.client = AMIClient(address='223.130.135.113',port=5038,timeout=None)
         self.client.login(username='admin',secret='amp1111')
         self.client.add_event_listener(self.event_listener,white_list=['Hangup'])
+        # self.client.add_event_listener(self.event_listener)
         self.number = None
         self.callback = callback
         self.model = None
@@ -36,12 +37,17 @@ class SendCall:
                 info(event.Exten)
             connected_line_num = event['Exten']
             info(connected_line_num)
+            info('self ' + self.number)
             if connected_line_num == self.number:
                 info("Hangup")
                 self.changeStat("3")
                 self.callback()
 
+        
+        
+
     def callback_response(self,response):
+        info(response)
         if response.status == 'Success':
             # DB 상태변경 (연결됨)
             info("connect")
@@ -61,7 +67,7 @@ class SendCall:
             Exten=number,
             Priority=1,
             Context='qcontext',
-            CallerID='python'
+            CallerID="python"
         )
 
         self.client.send_action(action,callback=self.callback_response)

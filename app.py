@@ -1,37 +1,23 @@
+import os
 import json
 import model
 import transaction
+import uvicorn
 from database import engine
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
-from callListSchedule import PdsListSchedule
+from dotenv import load_dotenv
+
 from routers.external import extRouter
 from routers.server import serverRouter
 from routers.call import callRouter
 from routers.ws import wsRouter
-import uvicorn
+
+from callListSchedule import PdsListSchedule
 from klogging import *
+from docs.tags import metadata
 
-tags_metadata = [
-    {
-        "name": "/call",
-        "description": "당일 기준 오토콜 목록을 리턴한다.",
-    },
-    {
-        "name": "/api",
-        "description": "음성모듈에서 INVITE 전화의 IN/OUT 구분을 확인하고 OUTBOUND콜인 경우 시나리오ID를 같이 리턴한다.",
-        "externalDocs": {
-            "description": "음성모듈",
-            "url": "https://github.com/CheongbinKim/q-phone",
-        },
-    },
-    {
-         "name": "/server",
-        "description": "PDS 서버 구동상태, 시작/중지 설정 API이다.",
-    }
-]
-
-app = FastAPI(openapi_tags=tags_metadata)
+app = FastAPI(openapi_tags=metadata)
 
 app.include_router(extRouter)
 app.include_router(serverRouter)
@@ -40,8 +26,6 @@ app.include_router(callRouter)
 
 origins = [
     "*"
-#    "http://localhost",
-#    "http://localhost:9090",
 ]
 
 app.add_middleware(
@@ -52,6 +36,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.websocket("/caller")
+async def websocket_demo(websocket: WebSocket):
+    await websocket.accept()
+    while True: 
+        data = await websocket.receive_text()
+        
+        print(data)
+
+        await websocket.send_text(json.dumps(data))
+            
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -75,9 +69,11 @@ async def root():
 
 # uvicorn
 if __name__ == '__main__' :
+    load_dotenv()
     log_config = uvicorn.config.LOGGING_CONFIG
     log_config["formatters"]["access"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
     log_config["formatters"]["default"]["fmt"] = "%(asctime)s - %(levelname)s - %(message)s"
-    uvicorn.run('app:app', host='0.0.0.0', port=9090, access_log=True,
+
+    uvicorn.run('app:app', host=os.getenv("HOST","127.0.0.1"), port=int(os.getenv("PORT",5064)), access_log=True,
                 reload_dirs=['.'], reload=True
     )
