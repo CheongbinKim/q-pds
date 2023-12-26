@@ -40,7 +40,7 @@ class SingleCall:
                             transaction.updSchedule(model)
                             self.sender.setModel(model)
                             info("originate " + model["phnNum"])
-                            self.sender.originate(model["phnNum"])
+                            self.sender.originate(model)
                     else:
                         #info("통화중이야..기다려!")
                         await asyncio.sleep(3)

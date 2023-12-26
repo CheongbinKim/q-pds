@@ -27,10 +27,10 @@ def regSchedule(resource):
         rtnObj = Object()
         scheDt = datetime.now().strftime('%Y%m%d')
         print(scheDt)
-        q = ScheduleManager(sid="D0004", scheDt=scheDt, phnNum=resource['phnNum'], stat=0, regDt=datetime.now(), updDt=datetime.now())
+        q = ScheduleManager(sid=resource['sid'], scheDt=scheDt, phnNum=resource['phnNum'], stat=0, regDt=datetime.now(), updDt=datetime.now())
 
         print(q)
-        '''
+        ''' 
         rtnObj.msg = ""
         if q > 0:
             rtnObj.msg = "추가되었습니다."

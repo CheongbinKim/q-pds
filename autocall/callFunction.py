@@ -11,6 +11,7 @@ class SendCall:
         self.client.add_event_listener(self.event_listener,white_list=['Hangup'])
         # self.client.add_event_listener(self.event_listener)
         self.number = None
+        self.sid = None
         self.callback = callback
         self.model = None
 
@@ -59,15 +60,17 @@ class SendCall:
             self.changeStat("4")
             self.callback()
 
-    def originate(self,number):
-        self.number = number
+    def originate(self,model):
+        self.number = model['phnNum']
+        self.sid = model['sid']
         action = SimpleAction(
             'Originate',
-            Channel='SIP/outgoing_07076630188/' + number,
-            Exten=number,
+            Channel='SIP/outgoing_07076630188/' + self.number,
+            Exten=self.number,
             Priority=1,
             Context='qcontext',
-            CallerID="python"
+            CallerID=f"OUTBOUND <{self.number}>",
+            Variable=f'SID={self.sid}'
         )
 
         self.client.send_action(action,callback=self.callback_response)
